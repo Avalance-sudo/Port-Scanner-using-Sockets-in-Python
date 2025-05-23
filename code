@@ -1,0 +1,36 @@
+import socket
+import sys
+from datetime import datetime
+
+# Get target from user input or command line argument
+if len(sys.argv) == 2:
+    target = sys.argv[1]
+else:
+    target = input("Please enter the IP address or domain name to scan: ")
+
+try:
+    t_IP = socket.gethostbyname(target)
+except socket.gaierror:
+    print("Hostname could not be resolved.")
+    sys.exit()
+
+print("+" * 45)
+print("Scan target: " + target)
+print("Scanning started: " + str(datetime.now()))
+print("=" * 45)
+
+try:
+    # Scan ports 1-1024
+    for port in range(1, 1025):
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.settimeout(0.5)
+        result = s.connect_ex((t_IP, port))
+        if result == 0:
+            print(f"Port {port}: Open")
+        s.close()
+except KeyboardInterrupt:
+    print("\nExiting program.")
+    sys.exit()
+except socket.error:
+    print("Could not connect to server.")
+    sys.exit()
